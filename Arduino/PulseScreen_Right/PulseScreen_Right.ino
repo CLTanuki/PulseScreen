@@ -24,11 +24,12 @@ void loop(){
   for(int s=0; s<2; s++){
     Math(s);
     sendDataToProcessing(s, 'F', Signal[s]);     // send Processing the raw Pulse Sensor data
-//    if (QS[s] == true){                       // Quantified Self flag is true when arduino finds a heartbeat
-//          sendDataToProcessing('B',BPM[s]);   // send heart rate with a 'B' prefix
-//          sendDataToProcessing('Q',IBI[s]);   // send time between beats with a 'Q' prefix
-//          QS[s] = false;                      // reset the Quantified Self flag for next time    
-//       }
+/*    if (QS[s] == true){                       // Quantified Self flag is true when arduino finds a heartbeat
+          sendDataToProcessing('B',BPM[s]);   // send heart rate with a 'B' prefix
+          sendDataToProcessing('Q',IBI[s]);   // send time between beats with a 'Q' prefix
+          QS[s] = false;                      // reset the Quantified Self flag for next time    
+       }
+*/
   }
     delay(20);
   //delay(2);    //  take a break
