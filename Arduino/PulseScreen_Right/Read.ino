@@ -8,7 +8,7 @@ volatile int amp[3] = {100, 100, 100};                   // used to hold amplitu
 volatile boolean firstBeat[3] = {true, true, true};        // used to seed rate array so we startup with reasonable BPM
 volatile boolean secondBeat[3] = {false, false, false};      // used to seed rate array so we startup with reasonable BPM
 int N[3];
-word runningTotal[3] = {0, 0, 0};
+word runningTotal[3] = {0, 0, 0};                 // WTF?!
 
 
 
