@@ -27,7 +27,16 @@ void loop(){
   for(int s=0; s<2; s++){
     Math(s);
     sendDataToProcessing(s, 'F', Signal[s]);     // send Processing the raw Pulse Sensor data
+<<<<<<< HEAD
     delay(2);
+=======
+/*    if (QS[s] == true){                       // Quantified Self flag is true when arduino finds a heartbeat
+          sendDataToProcessing('B',BPM[s]);   // send heart rate with a 'B' prefix
+          sendDataToProcessing('Q',IBI[s]);   // send time between beats with a 'Q' prefix
+          QS[s] = false;                      // reset the Quantified Self flag for next time    
+       }
+*/
+>>>>>>> a96426501ddf2144cd837ed27b341b2fd4645154
   }
   while(mySerial.available() <= 0);
   Serial.println(mySerial.read());
