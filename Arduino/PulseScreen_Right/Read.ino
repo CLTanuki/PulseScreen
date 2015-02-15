@@ -87,8 +87,3 @@ void Math(int s){                         // triggered when Timer2 counts to 124
   }
 
 }
-
-
-
-
-

@@ -1,3 +1,5 @@
+#include <SoftwareSerial.h>
+SoftwareSerial mySerial(A5, A4); // RX, TX
 //  VARIABLES
 int pulsePin[3] = {A0, A1, A2};                 // Pulse Sensor purple wire connected to analog pin 0
 
@@ -12,6 +14,7 @@ volatile boolean QS[3] = {false, false, false};        // becomes true when Ardu
 
 void setup(){
   Serial.begin(115200);             // we agree to talk fast!
+  mySerial.begin(9600);
    // UN-COMMENT THE NEXT LINE IF YOU ARE POWERING The Arduino at 5V and the Pulse Sensor AT 3V 
    // AND APPLY THE LOWER VOLTAGE TO THE A-REF PIN
 //   analogReference(EXTERNAL);   
@@ -24,13 +27,12 @@ void loop(){
   for(int s=0; s<2; s++){
     Math(s);
     sendDataToProcessing(s, 'F', Signal[s]);     // send Processing the raw Pulse Sensor data
-//    if (QS[s] == true){                       // Quantified Self flag is true when arduino finds a heartbeat
-//          sendDataToProcessing('B',BPM[s]);   // send heart rate with a 'B' prefix
-//          sendDataToProcessing('Q',IBI[s]);   // send time between beats with a 'Q' prefix
-//          QS[s] = false;                      // reset the Quantified Self flag for next time    
-//       }
+    delay(2)
   }
-    delay(20);
+  while(mySerial.available() <= 0);
+  Serial.println(mySerial.read());
+  
+    delay(10);
   //delay(2);    //  take a break
 }
 
@@ -40,10 +42,3 @@ void sendDataToProcessing(int sensor, char symbol, int data ){
   Serial.print(symbol);                // symbol prefix tells Processing what type of data is coming
   Serial.println(data);                // the data to send culminating in a carriage return
   }
-
-
-
-
-
-
-

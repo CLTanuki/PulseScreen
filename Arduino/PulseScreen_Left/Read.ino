@@ -17,7 +17,7 @@ word runningTotal[3] = {0, 0, 0};
 void Math(int s){                         // triggered when Timer2 counts to 124
   Signal[s] = analogRead(pulsePin[s]);              // read the Pulse Sensor 
   sampleCounter[s] += 2;                         // keep track of the time in mS with this variable
-  int N[s] = sampleCounter[s] - lastBeatTime[s];       // monitor the time since the last beat to avoid noise
+  N[s] = sampleCounter[s] - lastBeatTime[s];       // monitor the time since the last beat to avoid noise
 
     //  find the peak and trough of the pulse wave
   if(Signal[s] < thresh[s] && N[s] > (IBI[s]/5)*3){       // avoid dichrotic noise by waiting 3/5 of last IBI
@@ -53,10 +53,9 @@ void Math(int s){                         // triggered when Timer2 counts to 124
 
 
       // keep a running total of the last 10 IBI values
-      word runningTotal[s] = 0;                  // clear the runningTotal variable    
+      runningTotal[s] = 0;                  // clear the runningTotal variable    
 
-      int i;
-      for(i=0; i<=8; i++){                // shift data in the rate array
+      for(int i=0; i<=8; i++){                // shift data in the rate array
         rate[i] = rate[i++];                  // and drop the oldest IBI value 
         runningTotal[s] += rate[i];              // add up the 9 oldest IBI values
       }
@@ -88,8 +87,3 @@ void Math(int s){                         // triggered when Timer2 counts to 124
   }
 
 }
-
-
-
-
-
