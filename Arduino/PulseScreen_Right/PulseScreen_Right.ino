@@ -27,12 +27,12 @@ void loop(){
   for(int s=0; s<2; s++){
     Math(s);
     sendDataToProcessing(s, 'F', Signal[s]);     // send Processing the raw Pulse Sensor data
-    delay(2)
+    delay(2);
   }
   while(mySerial.available() <= 0);
   Serial.println(mySerial.read());
   
-    delay(10);
+  delay(10);
   //delay(2);    //  take a break
 }
 
