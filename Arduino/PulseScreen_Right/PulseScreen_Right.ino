@@ -1,5 +1,5 @@
 //  VARIABLES
-int pulsePin[3] = {0, 1, 2};                 // Pulse Sensor purple wire connected to analog pin 0
+int pulsePin[3] = {A0, A1, A2};                 // Pulse Sensor purple wire connected to analog pin 0
 
 // these variables are volatile because they are used during the interrupt service routine!
 volatile int BPM[3];                   // used to hold the pulse rate
@@ -20,23 +20,25 @@ void setup(){
 
 
 void loop(){
-  int s; 
-  for (s = 0; s < 2; s++)
+  Serial.println('loop'); 
+  for(int s=0; s<2; s++){
     Math(s);
-    sendDataToProcessing('S', Signal[s]);     // send Processing the raw Pulse Sensor data
-    if (QS[s] == true){                       // Quantified Self flag is true when arduino finds a heartbeat
-          sendDataToProcessing('B',BPM[s]);   // send heart rate with a 'B' prefix
-          sendDataToProcessing('Q',IBI[s]);   // send time between beats with a 'Q' prefix
-          QS[s] = false;                      // reset the Quantified Self flag for next time    
-       }
-  
-  delay(20);                             //  take a break
+    sendDataToProcessing(s, 'F', Signal[s]);     // send Processing the raw Pulse Sensor data
+//    if (QS[s] == true){                       // Quantified Self flag is true when arduino finds a heartbeat
+//          sendDataToProcessing('B',BPM[s]);   // send heart rate with a 'B' prefix
+//          sendDataToProcessing('Q',IBI[s]);   // send time between beats with a 'Q' prefix
+//          QS[s] = false;                      // reset the Quantified Self flag for next time    
+//       }
+  }
+    delay(20);
+  //delay(2);    //  take a break
 }
 
 
-void sendDataToProcessing(char symbol, int data ){
-    Serial.print(symbol);                // symbol prefix tells Processing what type of data is coming
-    Serial.println(data);                // the data to send culminating in a carriage return
+void sendDataToProcessing(int sensor, char symbol, int data ){
+  Serial.print(sensor);
+  Serial.print(symbol);                // symbol prefix tells Processing what type of data is coming
+  Serial.println(data);                // the data to send culminating in a carriage return
   }
 
 
