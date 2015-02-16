@@ -1,4 +1,5 @@
 #include <SoftwareSerial.h>
+
 SoftwareSerial mySerial(A5, A4); // RX, TX
 //  VARIABLES
 int pulsePin[3] = {A0, A1, A2};                 // Pulse Sensor purple wire connected to analog pin 0
@@ -14,31 +15,46 @@ volatile boolean QS[3] = {false, false, false};        // becomes true when Ardu
 
 void setup(){
   Serial.begin(115200);             // we agree to talk fast!
-  mySerial.begin(9600);
-   // UN-COMMENT THE NEXT LINE IF YOU ARE POWERING The Arduino at 5V and the Pulse Sensor AT 3V 
-   // AND APPLY THE LOWER VOLTAGE TO THE A-REF PIN
-//   analogReference(EXTERNAL);   
+  mySerial.begin(9600);   
 }
 
 
 
-void loop(){
-  Serial.println('loop'); 
-  for(int s=0; s<2; s++){
+void loop()
+{
+  for(int s=0; s<=2; s++)
+  {
     Math(s);
-    sendDataToProcessing(s, 'F', Signal[s]);     // send Processing the raw Pulse Sensor data
+    sendDataToProcessing(s, QS[s], Signal[s]);
+    QS[s] = false;
     delay(2);
   }
-  while(mySerial.available() <= 0);
-  Serial.println(mySerial.read());
-  
-  delay(10);
-  //delay(2);    //  take a break
+  ReadData();
+  delay(2);
 }
 
 
-void sendDataToProcessing(int sensor, char symbol, int data ){
-  Serial.print(sensor);
-  Serial.print(symbol);                // symbol prefix tells Processing what type of data is coming
-  Serial.println(data);                // the data to send culminating in a carriage return
+void sendDataToProcessing(int sensor, bool qs, int data ){
+  Serial.write(sensor);
+  Serial.write(qs);                // symbol prefix tells Processing what type of data is coming
+  Serial.write(data);                // the data to send culminating in a carriage return
+  Serial.write(data>>8);
   }
+  
+void ReadData()
+{
+  int C1, C2, C3, C4;
+  while(mySerial.available() <= 0);
+  C1 = mySerial.read();
+  while(mySerial.available() <= 0);
+  C2 = mySerial.read();
+  while(mySerial.available() <= 0);
+  C3 = mySerial.read();
+  while(mySerial.available() <= 0);
+  C4 = mySerial.read();
+
+  int Data = C3 + C4<<8;
+  Serial.write(C1);
+  Serial.write(C2);
+  Serial.write(Data);
+}
