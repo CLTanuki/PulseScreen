@@ -13,9 +13,8 @@ volatile boolean QS[3] = {false, false, false};        // becomes true when Ardu
 
 
 void setup(){
-  pinMode(13, 1);
   Serial.begin(115200);             // we agree to talk fast!
-  mySerial.begin(9600);  
+  mySerial.begin(9600);
 }
 
 
@@ -24,18 +23,24 @@ void loop()
   for(int s=0; s<=2; s++)
   {
     Math(s);
-    sendDataToProcessing(s+3, QS[s], Signal[s]);    // send Processing the raw Pulse Sensor data
-    QS[s] = false;
-    delay(2);
+    if (QS[s])
+    {
+      sendDataToProcessing(s, 1, Signal[s]);
+      QS[s] = false;
+    }
+    else
+    {
+      sendDataToProcessing(s, 0, Signal[s]);
+    }
+    delay(3);
   }
-  delay(2);
 }
 
 
 void sendDataToProcessing(int sensor, bool qs, int data )
 {
-  Serial.write(sensor);
-  Serial.write(qs);
-  Serial.write(data);
-  Serial.write(data>>8);
+  mySerial.write(sensor);
+  mySerial.write(qs);
+  mySerial.write(data);
+  mySerial.write(data>>8);
 }

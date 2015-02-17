@@ -15,8 +15,8 @@ word runningTotal[3] = {0, 0, 0};                 // WTF?!
 // THIS IS THE TIMER 2 INTERRUPT SERVICE ROUTINE. 
 // Timer 2 makes sure that we take a reading every 2 miliseconds
 void Math(int s){                         // triggered when Timer2 counts to 124
-  Signal[s] = analogRead(pulsePin[s]);              // read the Pulse Sensor 
-  sampleCounter[s] += 2;                         // keep track of the time in mS with this variable
+  Signal[s] = analogRead(pulsePin[s]);             // read the Pulse Sensor 
+  sampleCounter[s] = millis() - sampleCounter[s];  // keep track of the time in mS with this variable
   N[s] = sampleCounter[s] - lastBeatTime[s];       // monitor the time since the last beat to avoid noise
 
     //  find the peak and trough of the pulse wave

@@ -25,8 +25,15 @@ void loop()
   for(int s=0; s<=2; s++)
   {
     Math(s);
-    sendDataToProcessing(s, QS[s], Signal[s]);
-    QS[s] = false;
+    if (QS[s])
+    {
+      sendDataToProcessing(s, 1, Signal[s]);
+      QS[s] = false;
+    }
+    else
+    {
+      sendDataToProcessing(s, 0, Signal[s]);
+    }
     delay(2);
   }
   ReadData();
@@ -35,6 +42,9 @@ void loop()
 
 
 void sendDataToProcessing(int sensor, bool qs, int data ){
+  Serial.write(0xFF);
+  Serial.write(0x00);
+  Serial.write(0xFF);
   Serial.write(sensor);
   Serial.write(qs);                // symbol prefix tells Processing what type of data is coming
   Serial.write(data);                // the data to send culminating in a carriage return
@@ -43,18 +53,21 @@ void sendDataToProcessing(int sensor, bool qs, int data ){
   
 void ReadData()
 {
-  int C1, C2, C3, C4;
+  byte sensor, qs, fdata, sdata;
   while(mySerial.available() <= 0);
-  C1 = mySerial.read();
+  sensor = mySerial.read();
   while(mySerial.available() <= 0);
-  C2 = mySerial.read();
+  qs = mySerial.read();
   while(mySerial.available() <= 0);
-  C3 = mySerial.read();
+  fdata = mySerial.read();
   while(mySerial.available() <= 0);
-  C4 = mySerial.read();
+  sdata = mySerial.read();
 
-  int Data = C3 + C4<<8;
-  Serial.write(C1);
-  Serial.write(C2);
-  Serial.write(Data);
+  Serial.write(0xFF);
+  Serial.write(0x00);
+  Serial.write(0xFF);
+  Serial.write(sensor);
+  Serial.write(qs);
+  Serial.write(fdata);
+  Serial.write(sdata);
 }
