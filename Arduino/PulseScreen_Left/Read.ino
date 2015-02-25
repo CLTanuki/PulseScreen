@@ -1,4 +1,4 @@
-volatile int rate[10];                    // array to hold last ten IBI values
+volatile int rate[3][10];                    // array to hold last ten IBI values
 volatile unsigned long sampleCounter[3] = {0, 0, 0};          // used to determine pulse timing
 volatile unsigned long lastBeatTime[3] = {0, 0, 0};           // used to find IBI
 volatile int P[3] = {512, 512, 512};                      // used to find peak in pulse wave, seeded
@@ -16,7 +16,7 @@ word runningTotal[3] = {0, 0, 0};
 // Timer 2 makes sure that we take a reading every 2 miliseconds
 void Math(int s){                         // triggered when Timer2 counts to 124
   Signal[s] = analogRead(pulsePin[s]);             // read the Pulse Sensor 
-  sampleCounter[s] = millis() - sampleCounter[s];  // keep track of the time in mS with this variable
+  sampleCounter[s] += millis() - sampleCounter[s];  // keep track of the time in mS with this variable
   N[s] = sampleCounter[s] - lastBeatTime[s];       // monitor the time since the last beat to avoid noise
 
     //  find the peak and trough of the pulse wave
@@ -33,7 +33,7 @@ void Math(int s){                         // triggered when Timer2 counts to 124
   //  NOW IT'S TIME TO LOOK FOR THE HEART BEAT
   // signal surges up in value every time there is a pulse
   if (N[s] > 250){                                   // avoid high frequency noise
-    if ( (Signal[s] > thresh[s]) && (Pulse == false) && (N[s] > (IBI[s]/5)*3) ){        
+    if ( (Signal[s] > thresh[s]) && (Pulse[s] == false) && (N[s] > (IBI[s]/5)*3) ){        
       Pulse[s] = true;                               // set the Pulse flag when we think there is a pulse
       IBI[s] = sampleCounter[s] - lastBeatTime[s];         // measure time between beats in mS
       lastBeatTime[s] = sampleCounter[s];               // keep track of time for next pulse
@@ -41,7 +41,7 @@ void Math(int s){                         // triggered when Timer2 counts to 124
       if(secondBeat[s]){                        // if this is the second beat, if secondBeat == TRUE
         secondBeat[s] = false;                  // clear secondBeat flag
         for(int i=0; i<=9; i++){             // seed the running total to get a realisitic BPM at startup
-          rate[i] = IBI[s];                      
+          rate[s][i] = IBI[s];                      
         }
       }
 
@@ -56,12 +56,12 @@ void Math(int s){                         // triggered when Timer2 counts to 124
       runningTotal[s] = 0;                  // clear the runningTotal variable    
 
       for(int i=0; i<=8; i++){                // shift data in the rate array
-        rate[i] = rate[i++];                  // and drop the oldest IBI value 
-        runningTotal[s] += rate[i];              // add up the 9 oldest IBI values
+        rate[s][i] = rate[s][i++];                  // and drop the oldest IBI value 
+        runningTotal[s] += rate[s][i];              // add up the 9 oldest IBI values
       }
 
-      rate[9] = IBI[s];                          // add the latest IBI to the rate array
-      runningTotal[s] += rate[9];                // add the latest IBI to runningTotal
+      rate[s][9] = IBI[s];                          // add the latest IBI to the rate array
+      runningTotal[s] += rate[s][9];                // add the latest IBI to runningTotal
       runningTotal[s] /= 10;                     // average the last 10 IBI values 
       BPM[s] = 60000/runningTotal[s];               // how many beats can fit into a minute? that's BPM!
       QS[s] = true;                              // set Quantified Self flag 

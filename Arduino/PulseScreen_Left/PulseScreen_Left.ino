@@ -2,7 +2,7 @@
 
 SoftwareSerial mySerial(A4, A5); // RX, TX
 //  VARIABLES
-int pulsePin[3] = {A0, A1, A2};                 // Pulse Sensor purple wire connected to analog pin 0
+int pulsePin[3] = {A1, A2, A3};                 // Pulse Sensor purple wire connected to analog pin 0
 
 // these variables are volatile because they are used during the interrupt service routine!
 volatile int BPM[3];                   // used to hold the pulse rate
@@ -19,28 +19,33 @@ void setup(){
 
 
 void loop()
-{
-  for(int s=0; s<=2; s++)
+{ 
+  for(int i=0; i < 3; i++)
   {
-    Math(s);
-    if (QS[s])
-    {
-      sendDataToProcessing(s, 1, Signal[s]);
-      QS[s] = false;
-    }
-    else
-    {
-      sendDataToProcessing(s, 0, Signal[s]);
-    }
-    delay(3);
+    Math(i);
+    delay(1);
   }
+  sendDataToProcessing();
 }
 
 
-void sendDataToProcessing(int sensor, bool qs, int data )
+void sendDataToProcessing()
 {
-  mySerial.write(sensor);
-  mySerial.write(qs);
-  mySerial.write(data);
-  mySerial.write(data>>8);
+  byte SH[3], SL[3];
+  
+  for(int i = 0; i < 3; i++)
+  {
+    SL[i] = Signal[i];
+    SH[i] = Signal[i]>>8;
+//    if(QS[i])  SH[i] |= 0b10000000;
+  }
+  
+  mySerial.write(0xFF);
+  mySerial.write(0xFF);
+
+  for(int i = 0; i < 3; i++)
+  {
+    mySerial.write(SH[i]);
+    mySerial.write(SL[i]);    
+  }
 }

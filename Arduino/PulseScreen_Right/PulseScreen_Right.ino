@@ -2,7 +2,7 @@
 
 SoftwareSerial mySerial(A5, A4); // RX, TX
 //  VARIABLES
-int pulsePin[3] = {A0, A1, A2};                 // Pulse Sensor purple wire connected to analog pin 0
+int pulsePin[3] = {A1, A2, A3};                 // Pulse Sensor purple wire connected to analog pin 0
 
 // these variables are volatile because they are used during the interrupt service routine!
 volatile int BPM[3];                   // used to hold the pulse rate
@@ -10,6 +10,7 @@ volatile int Signal[3];                // holds the incoming raw data
 volatile int IBI[3] = {600, 600, 600};             // holds the time between beats, must be seeded! 
 volatile boolean Pulse[3] = {false, false, false};     // true when pulse wave is high, false when it's low
 volatile boolean QS[3] = {false, false, false};        // becomes true when Arduoino finds a beat.
+byte data[6][4];
 
 
 
@@ -18,56 +19,65 @@ void setup(){
   mySerial.begin(9600);   
 }
 
-
+byte Sensors[6][2];
 
 void loop()
 {
-  for(int s=0; s<=2; s++)
-  {
-    Math(s);
-    if (QS[s])
-    {
-      sendDataToProcessing(s, 1, Signal[s]);
-      QS[s] = false;
-    }
-    else
-    {
-      sendDataToProcessing(s, 0, Signal[s]);
-    }
-    delay(2);
-  }
+//  unsigned long int Time = micros();
   ReadData();
-  delay(2);
+  for(int i=0; i < 3; i++)
+  {
+    Math(i);
+    delay(1);
+  }
+  sendDataToProcessing();
+//  while(micros() - Time <= 2000);
 }
 
 
-void sendDataToProcessing(int sensor, bool qs, int data ){
-  Serial.write(0xFF);
-  Serial.write(0x00);
-  Serial.write(0xFF);
-  Serial.write(sensor);
-  Serial.write(qs);                // symbol prefix tells Processing what type of data is coming
-  Serial.write(data);                // the data to send culminating in a carriage return
-  Serial.write(data>>8);
+void sendDataToProcessing()
+{  
+  for(int i = 0; i < 3; i++)
+  {
+    Sensors[i+3][1] = Signal[i];
+    Sensors[i+3][0] = Signal[i]>>8;
+//    if(QS[i])  Sensors[i+3][0] |= 0b10000000;
   }
+  
+  Serial.write(0xFF);
+  Serial.write(0xFF);
+
+  for(int i = 0; i < 6; i++)
+  {
+    Serial.write(Sensors[i][0]);
+    Serial.write(Sensors[i][1]);
+  }
+  digitalWrite(13, LOW);
+}
   
 void ReadData()
 {
-  byte sensor, qs, fdata, sdata;
   while(mySerial.available() <= 0);
-  sensor = mySerial.read();
-  while(mySerial.available() <= 0);
-  qs = mySerial.read();
-  while(mySerial.available() <= 0);
-  fdata = mySerial.read();
-  while(mySerial.available() <= 0);
-  sdata = mySerial.read();
+  if(mySerial.read() != 0xFF)  return;
 
-  Serial.write(0xFF);
-  Serial.write(0x00);
-  Serial.write(0xFF);
-  Serial.write(sensor);
-  Serial.write(qs);
-  Serial.write(fdata);
-  Serial.write(sdata);
+  while(mySerial.available() <= 0);
+  if(mySerial.read() != 0xFF)  return;
+
+  while(mySerial.available() <= 0);
+  Sensors[0][0] = mySerial.read();
+
+  while(mySerial.available() <= 0);
+  Sensors[0][1] = mySerial.read();
+
+  while(mySerial.available() <= 0);
+  Sensors[1][0] = mySerial.read();
+
+  while(mySerial.available() <= 0);
+  Sensors[1][1] = mySerial.read();
+
+  while(mySerial.available() <= 0);
+  Sensors[2][0] = mySerial.read();
+
+  while(mySerial.available() <= 0);
+  Sensors[2][1] = mySerial.read();
 }
