@@ -17,7 +17,11 @@ byte data[6][4];
 void setup(){
   Serial.begin(115200);             // we agree to talk fast!
   mySerial.begin(9600);
+<<<<<<< HEAD
   delay(4);  
+=======
+  delay(4);
+>>>>>>> origin/master
 }
 
 byte Sensors[6][2];
