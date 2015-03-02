@@ -1,8 +1,8 @@
 #include <SoftwareSerial.h>
 
-SoftwareSerial mySerial(A5, A4); // RX, TX
+SoftwareSerial mySerial(11, 10); // RX, TX
 //  VARIABLES
-int pulsePin[3] = {A1, A2, A3};                 // Pulse Sensor purple wire connected to analog pin 0
+int pulsePin[3] = {A0, A1, A2};                 // Pulse Sensor purple wire connected to analog pin 0
 
 // these variables are volatile because they are used during the interrupt service routine!
 volatile int BPM[3];                   // used to hold the pulse rate
@@ -16,14 +16,14 @@ byte data[6][4];
 
 void setup(){
   Serial.begin(115200);             // we agree to talk fast!
-  mySerial.begin(9600);   
+  mySerial.begin(9600);
+  delay(4);  
 }
 
 byte Sensors[6][2];
 
 void loop()
 {
-//  unsigned long int Time = micros();
   ReadData();
   for(int i=0; i < 3; i++)
   {
@@ -31,7 +31,6 @@ void loop()
     delay(1);
   }
   sendDataToProcessing();
-//  while(micros() - Time <= 2000);
 }
 
 
